@@ -208,4 +208,3 @@ elif page == "Display Database":
     else:
         st.write("Database is empty.")
 
-

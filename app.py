@@ -2,13 +2,9 @@ import streamlit as st
 import sqlite3
 from datetime import date
 
-DB_NAME = "users.db"
-
 # ---------------- DATABASE ---------------- #
 
-def get_connection(db_name=None):
-    if db_name is None:
-        db_name = DB_NAME
+def get_connection(db_name="users.db"):
     return sqlite3.connect(db_name)
 
 def create_table():
@@ -62,8 +58,8 @@ def update_user(user_id, first, last, dob):
     cur = conn.cursor()
     cur.execute("""
                 UPDATE users
-                SET first_name=?, last_name=?, dob=?
-                WHERE id=?
+                SET first_name = ?, last_name = ?, dob = ?
+                WHERE id = ?
                 """, (first, last, dob, user_id))
     conn.commit()
     conn.close()
@@ -71,7 +67,7 @@ def update_user(user_id, first, last, dob):
 def delete_user(user_id):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("DELETE FROM users WHERE id=?", (user_id,))
+    cur.execute("DELETE FROM users WHERE id = ?", (user_id,))
     conn.commit()
     conn.close()
 
@@ -86,12 +82,12 @@ def fetch_all_users():
 # Initialize DB
 create_table()
 
-# ---------------- SIDEBAR ---------------- #
+# ---------------- SIDEBAR (DROPDOWN NAV) ---------------- #
 
 st.sidebar.title("Navigation")
 
-page = st.sidebar.radio(
-    "Go to",
+page = st.sidebar.selectbox(
+    "Choose an option",
     [
         "Home",
         "Add User",
@@ -111,14 +107,14 @@ if page == "Home":
     st.markdown("""
     ### Purpose
     This application provides a simple interface for managing user records
-    using a local database.
+    using a local SQLite database.
 
     ### Features
-    - Add new users to the database
+    - Add new users
     - Search users by name or date of birth
-    - Edit existing user information
-    - Delete users from the database
-    - Display all stored records
+    - Edit existing user records
+    - Delete users
+    - Display all stored users
 
     ### Technology Stack
     - Python
@@ -135,8 +131,8 @@ elif page == "Add User":
 
     dob = st.date_input(
         "Date of Birth",
-        min_value= date(1950, 1, 1),    # Earliest selectable date
-        max_value= date.today() # Latest selectable date
+        min_value=date(1950, 1, 1),
+        max_value=date.today()
     )
 
     if st.button("Add User"):
@@ -173,12 +169,12 @@ elif page == "Edit User":
             f"{u[0]}: {u[1]} {u[2]} ({u[3]})": u for u in users
         }
 
-        selected = st.selectbox("Select User", user_map.keys())
+        selected = st.selectbox("Select User", list(user_map.keys()))
         user = user_map[selected]
 
         new_first = st.text_input("First Name", user[1])
         new_last = st.text_input("Last Name", user[2])
-        new_dob = st.text_input("DOB", user[3])
+        new_dob = st.text_input("DOB (YYYY-MM-DD)", user[3])
 
         if st.button("Update User"):
             update_user(user[0], new_first, new_last, new_dob)
@@ -196,7 +192,7 @@ elif page == "Delete User":
             f"{u[0]}: {u[1]} {u[2]} ({u[3]})": u[0] for u in users
         }
 
-        selected = st.selectbox("Select User", user_map.keys())
+        selected = st.selectbox("Select User", list(user_map.keys()))
 
         if st.button("Delete User"):
             delete_user(user_map[selected])
@@ -213,4 +209,3 @@ elif page == "Display Database":
         st.write("Database is empty.")
 
 
-#write pytest test cases and get 80% code coverage

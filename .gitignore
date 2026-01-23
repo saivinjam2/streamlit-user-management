@@ -4,6 +4,6 @@ users.db
 test_users.db
 htmlcov/
 .env
-PythonFunctions/
-PythonDSA/
-StreamLit/
+PythonPractice/PythonFunctions/
+PythonPractice/PythonDSA/
+PythonPractice/StreamLit/
